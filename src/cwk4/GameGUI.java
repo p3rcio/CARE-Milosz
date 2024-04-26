@@ -151,6 +151,7 @@ public class GameGUI
 
         }
     }
+    ///
 
 
     //DISPLAY ALL CHALLENGES

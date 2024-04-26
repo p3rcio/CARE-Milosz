@@ -15,6 +15,7 @@ public class Challenges {
      * @param skill - numerical skill of enemy
      * @param reward - reward gain from enemy
      */
+    //
     public Challenges(int challNo, ChallengeType challType, String enemy, int skill, int reward){
         challengeNo = challNo;
         challengeType = challType;

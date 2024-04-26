@@ -1,5 +1,5 @@
 package cwk4;
-
+//
 public class Dragon implements Champion{
     private String champName;
     private int champSkill;

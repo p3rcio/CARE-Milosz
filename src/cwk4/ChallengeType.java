@@ -1,5 +1,5 @@
 package cwk4;
-
+//
 import java.io.*;
 /**
  * Enumeration class ChallengeType - list possible types of challenges
