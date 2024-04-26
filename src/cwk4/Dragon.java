@@ -8,6 +8,13 @@ public class Dragon implements Champion{
     private String champType;
     private ChampionState champState;
 
+    /**
+     * sets up the constructor for the dragon object
+     * @param name
+     * @param skill
+     * @param talk
+     */
+
     public Dragon(String name, int skill, boolean talk){
         champName = name;
         champSkill = skill;
@@ -17,11 +24,19 @@ public class Dragon implements Champion{
         champState = ChampionState.WAITING;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getChampType() {
         return champType;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getChampionName() {
         return champName;

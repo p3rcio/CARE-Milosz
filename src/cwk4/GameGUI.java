@@ -135,6 +135,23 @@ public class GameGUI
     }
 
 
+    private class meetchallenge implements ActionListener
+    {
+        public void actionPerformed(ActionEvent e) {
+            String ChallengeNumber = JOptionPane.showInputDialog(myFrame,"Please Enter in a Challenge Number", JOptionPane.INFORMATION_MESSAGE);
+            try {
+                int number = Integer.parseInt(ChallengeNumber);
+                int ChampionDetails = gp.meetChallenge(number);
+                JOptionPane.showMessageDialog(myFrame,ChampionDetails);
+
+            } catch (NumberFormatException ex) {
+                // Handle the case where the input is not a valid integer
+                JOptionPane.showMessageDialog(null, "Invalid input. Please enter a valid integer.");
+            }
+
+        }
+    }
+
 
     //DISPLAY ALL CHALLENGES
     private class DisplayAllChallenges implements ActionListener // function to display all of the challenges
@@ -177,6 +194,10 @@ public class GameGUI
         public void actionPerformed(ActionEvent e) {
             String ChampionName = JOptionPane.showInputDialog(myFrame,"Please Enter in a Champion Name to add to the team", JOptionPane.INFORMATION_MESSAGE);
             int Enterthechampion = gp.enterChampion(ChampionName);
+            String ChampionDetails = gp.getChampionDetails(ChampionName);
+            JOptionPane.showMessageDialog(myFrame, "You have Entered in the Champion:" + ChampionDetails);
+
+
 
         }
     }

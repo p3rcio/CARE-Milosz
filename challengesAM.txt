@@ -1,12 +1,12 @@
-Magic,Borg,3,100,   
-Fight,Huns,3,120,   
-Mystery,Ferengi,3,150,   
-Magic,Vandals,9,200,   
-Mystery,Borg ,7,90,   
-Fight,Goths,8,45,   
-Magic,Franks,10,200,   
-Fight,Sith,10,150, 
-Mystery,Cardashian,9,300
-Fight,Jute,2,300
-Magic Celt, 2, 250
-Mystery, Celt, 1 250
+Magic,Borg,3,100, 1
+Fight,Huns,3,120, 2
+Mystery,Ferengi,3,150, 3
+Magic,Vandals,9,200,  4
+Mystery,Borg ,7,90,  5
+Fight,Goths,8,45,   6
+Magic,Franks,10,200, 7
+Fight,Sith,10,150, 8
+Mystery,Cardashian,9,300, 9
+Fight,Jute,2,300, 10
+Magic Celt, 2, 250, 11
+Mystery, Celt, 1, 250, 12

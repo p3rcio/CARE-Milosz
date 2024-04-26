@@ -17,7 +17,7 @@ public class Tournament implements CARE {
     private BufferedReader reader;
     private ArrayList<Champion> allChampions = new ArrayList<Champion>();
     private ArrayList<Challenges> allChallenges = new ArrayList<Challenges>();
-    private ArrayList<Champion> vizierTeam;
+    private String viz;
 
 
 //**************** CARE **************************
@@ -28,9 +28,11 @@ public class Tournament implements CARE {
      * @param viz the name of the vizier
      */
     public Tournament(String viz) {
+        this.viz = viz;
         vizier = new Vizier(viz);
         setupChampions();
         setupChallenges();
+
     }
 
     /**
@@ -40,14 +42,12 @@ public class Tournament implements CARE {
      * @param viz      the name of the vizier
      * @param filename name of file storing challenges
      */
-    public Tournament(String viz, String challengesAM, String Savegame)  //Task 3.5
+    public Tournament(String viz, String challengesAM, String Savegame, String fname)  //Task 3.5
     {
-
-
         setupChampions();
         readChallenges(challengesAM);
         saveGame(Savegame);
-        //loadGame(fname);
+        loadGame(fname);
     }
 
 
@@ -425,25 +425,31 @@ public class Tournament implements CARE {
      */
     private Champion getChampionForChall(Challenges chall) {
         for (Champion champ : vizier.getVizierChampArray()) {
-            // wizard can take on magic, fight and mystery challenges
-            if (champ.getChampType() == "Wizard" && chall.getChallengeType() == ChallengeType.FIGHT || chall.getChallengeType() == ChallengeType.MYSTERY || chall.getChallengeType() == ChallengeType.MAGIC) {
-                return champ;
-                // warrior can only take on fight challenges
-            } else if (champ.getChampType() == "Warrior" && chall.getChallengeType() == ChallengeType.FIGHT) {
-                return champ;
+            String champType = champ.getChampType();
 
-            } else if (champ.getChampType() == "Dragon" && chall.getChallengeType() == ChallengeType.FIGHT) {
+            // Wizard can take on magic, fight, and mystery challenges
+            if (champType.equals("Wizard") && (chall.getChallengeType() == ChallengeType.FIGHT || chall.getChallengeType() == ChallengeType.MYSTERY || chall.getChallengeType() == ChallengeType.MAGIC)) {
                 return champ;
             }
-            // Dragon that can talk can take on fight and mystery challenges
-            else if (champ.getChampType() == "Dragon" && chall.getChallengeType() == ChallengeType.FIGHT && champ.canTalk()) {
+            // Warrior can only take on fight challenges
+            else if (champType.equals("Warrior") && chall.getChallengeType() == ChallengeType.FIGHT) {
                 return champ;
             }
-
-
+            // Dragon can take on fight challenges if it can talk
+            else if (champType.equals("Dragon") && chall.getChallengeType() == ChallengeType.FIGHT && champ.canTalk()) {
+                return champ;
             }
-            return null; // if champion not found
+            // Dragon can take on mystery challenges if it can talk
+            else if (champType.equals("Dragon") && chall.getChallengeType() == ChallengeType.MYSTERY && champ.canTalk()) {
+                return champ;
+            }
+            // Dragon can take on fight challenges regardless of talking ability
+            else if (champType.equals("Dragon") && chall.getChallengeType() == ChallengeType.FIGHT) {
+                return champ;
+            }
         }
+        return null; // If champion not found
+    }
 
 
     //*******************************************************************************
@@ -460,21 +466,29 @@ public class Tournament implements CARE {
      */
     public void readChallenges(String challengesAM) {
         try {
-            reader = new BufferedReader(new FileReader(challengesAM));
+            BufferedReader reader = new BufferedReader(new FileReader(challengesAM));
             String line = reader.readLine();
 
             while (line != null) {
-                StringTokenizer st = new StringTokenizer(line, ", ");
-                int sNumber = Integer.parseInt(st.nextToken());
-                String sName = st.nextToken();
-                String sChallenge = st.nextToken();
+                StringTokenizer st = new StringTokenizer(line, ",");
+                int stype = Integer.parseInt(st.nextToken().trim());
+                String schallengeString = st.nextToken().trim(); // Read the string representation
+                ChallengeType schallenge = ChallengeType.valueOf(schallengeString.toUpperCase());
+                String sName = st.nextToken().trim();
+                int sDifficulty = Integer.parseInt(st.nextToken().trim());
+                int sReward = Integer.parseInt(st.nextToken().trim());
 
+                // Create and store the challenge
+                Challenges challenge = new Challenges(stype, schallenge, sName, sDifficulty, sReward);
+                allChallenges.add(challenge);
                 line = reader.readLine();
             }
+            reader.close(); // Close the reader when done
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 
     /**
      * reads all information about the game from the specified file
@@ -484,45 +498,72 @@ public class Tournament implements CARE {
      * @return the game (as a Tournament object)
      */
     public Tournament loadGame(String fname) {
+        String vizierName = null; // Initialize vizierName
         try (BufferedReader reader = new BufferedReader(new FileReader(fname))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] tokens = line.split(",");
-                if (tokens.length >= 7) {
-                    String sChampionName = tokens[0].trim();
-                    int sSkilllevel = Integer.parseInt(tokens[1].trim());
-                    String sWeapon = tokens[2].trim();
-                    String sChallengeType = tokens[3].trim();
-                    String sEnemyName = tokens[4].trim();
-                    int sSkillRequired = Integer.parseInt(tokens[5].trim());
-                    int sRewardGame = Integer.parseInt(tokens[6].trim());
-
-                    Champion champion = null;
-                    if (sChampionName.equals("Wizard")) {
-                        champion = new Wizard(sChampionName, sSkilllevel, sWeapon, true);
-                    } else if (sChampionName.equals("Dragon")) {
-                        champion = new Dragon(sChampionName, sSkilllevel, true);
-                    } else if (sChampionName.equals("Warrior")) {
-                        champion = new Warrior(sChampionName, sSkilllevel, sWeapon, sRewardGame);
-                    }
-
+                if (tokens.length >= 2) {
+                    String type = tokens[0].trim();
                     try {
-                        ChallengeType challengeType = ChallengeType.valueOf(sChallengeType.toUpperCase());
-                        Challenges challenge = new Challenges(0, challengeType, sEnemyName, sSkillRequired, sRewardGame);
-                        allChampions.add(champion);
-                        allChallenges.add(challenge);
+                        if (type.equals("VIZIER")) { // Check if it's the VIZIER line
+                            vizierName = tokens[1].trim(); // Set vizierName
+                        } else if (type.equals("VIZIER_TEAM") || type.equals("RESERVE")) {
+                            // Read champions from VIZIER_TEAM or RESERVE
+                            String sChampionName = tokens[1].trim();
+                            int sSkilllevel = Integer.parseInt(tokens[2].trim());
+
+                            ChampionState championState;
+
+                            // Check if the ChampionState exists in the enum
+                            championState = ChampionState.valueOf(tokens[3].trim());
+
+
+                            Champion champion = createChampion(sChampionName, sSkilllevel, championState);
+                            if (champion != null) {
+                                if (type.equals("VIZIER_TEAM")) {
+                                    vizier.getVizierChampArray().add(champion);
+                                } else {
+                                    allChampions.add(champion);
+                                }
+                            }
+                        } else if (type.equals("TREASURY")) {
+                            // Handle treasury loading logic here
+                        }
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
                     } catch (IllegalArgumentException e) {
-                        System.err.println("Invalid challenge type: " + sChallengeType);
-                        // Handle or skip this line based on your application's logic
+                        e.printStackTrace();
                     }
                 }
             }
 
-            return new Tournament("Ganfrank");
-        } catch (IOException | NumberFormatException | ArrayIndexOutOfBoundsException e) {
+            // Construct and return the loaded Tournament object
+            Tournament tournament = new Tournament(vizierName);
+            return tournament;
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+
+
+
+
+    private Champion createChampion(String sChampionName, int sSkilllevel, ChampionState championState) {
+        Champion champion = null;
+        if (sChampionName.equals("Wizard")) {
+            champion = new Wizard(sChampionName, sSkilllevel, "", true); // Adjust constructor parameters accordingly
+        } else if (sChampionName.equals("Dragon")) {
+            champion = new Dragon(sChampionName, sSkilllevel, true); // Adjust constructor parameters accordingly
+        } else if (sChampionName.equals("Warrior")) {
+            champion = new Warrior(sChampionName, sSkilllevel, "", 0); // Adjust constructor parameters accordingly
+        }
+        if (champion != null) {
+            champion.setChampionState(championState);
+        }
+        return champion;
     }
 
 
@@ -531,33 +572,37 @@ public class Tournament implements CARE {
      *
      * @param fname name of file storing requests
      */
+
+
     public void saveGame(String Savegame) {
-
         try (PrintWriter writer = new PrintWriter(new FileWriter(Savegame))) {
-            for (Champion champion : vizierTeam) {
-                writer.printf("VIZIER_TEAM,%s,%d,%s,%n", champion.getChampionName(), champion.getChampSkill(), champion.getChampionState().toString());
+            // Saving Vizier
+            writer.printf("VIZIER,%s%n", vizier.getVizierName()); // Save Vizier's name
+
+
+            // Saving vizierTeam
+            writer.println("VIZIER_TEAM");
+            for (Champion champion : vizier.getVizierChampArray()) {
+                if (champion != null) {
+                    writer.printf("%s,%d,%s%n", champion.getChampionName(), champion.getChampSkill(), champion.getChampionState().toString());
+                }
             }
 
-            for (int i = 0; i < allChampions.size(); i++) {
-                Champion champion = allChampions.get(i);
-                Challenges challenge = allChallenges.get(i);
-                String championName = champion.getChampionName();
-                int skillLevel = champion.getChampSkill();
-                ChampionState championState = ChampionState.WAITING;
-                champion.setChampionState(championState);
-                int challengenumber = challenge.getChallengeNo();
-                ChallengeType schallengeType = challenge.getChallengeType();
-                int skillRequired = challenge.getSkillRequired();
-                String challengeDescription = String.valueOf(challenge.getChallengeType());
-                writer.printf("%s, %d, %s, %d%n", championName, skillLevel, championState.toString(), skillRequired);
-                writer.printf("%d, %s, %d, %s%n", challengenumber, schallengeType.toString(), skillRequired, challengeDescription);
+            // Saving champions in reserve
+            writer.println("RESERVE");
+            for (Champion champion : allChampions) {
+                if (champion != null) {
+                    writer.printf("%s,%d,%s%n", champion.getChampionName(), champion.getChampSkill(), champion.getChampionState().toString());
+                }
             }
-        } catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
 }
+
+
+
 
 
 

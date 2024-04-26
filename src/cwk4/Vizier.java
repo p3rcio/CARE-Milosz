@@ -7,8 +7,13 @@ public class Vizier {
     private String vizierName;
     private boolean defeated;
     private int vizierGulden;
-    private ArrayList<Champion> vizierTeam; // array of champions in player's rooster
+    public ArrayList<Champion> vizierTeam; // array of champions in player's rooster
     private ArrayList<Champion> disqualifiedChamps; // array of disqualified vizier champs
+
+    /**
+     * this is the vizer constructor for creating new vizier object
+     * @param name - name of vizier
+     */
     public Vizier(String name){
         vizierName = name;
         defeated = false;
