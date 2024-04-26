@@ -1,5 +1,5 @@
 package cwk4;
-
+//
 public class Warrior implements Champion{
     private String champName;
     private int champSkill;

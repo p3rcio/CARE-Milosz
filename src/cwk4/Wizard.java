@@ -25,7 +25,7 @@ public class Wizard implements Champion{
             return "No";
         }
     }
-
+//
     @Override
     public String getChampType() {
         return champType;

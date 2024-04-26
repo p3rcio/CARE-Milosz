@@ -145,7 +145,7 @@ public interface CARE extends Serializable
      * @return an int showing the result(as above) of fighting the challenge
      */ 
     public int meetChallenge(int chalNo);
-  
+  //
 // These methods are not needed until Task 3.5
     // ***************   file write/read  *********************
     /** Writes whole game to the specified file
